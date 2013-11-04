@@ -14,6 +14,11 @@ group :development do
   gem 'sqlite3'
   gem 'pry'
   gem 'pry-nav'
+  gem 'rspec-rails'
+end
+
+group :test do
+  gem 'rspec-rails'
 end
 
 group :production do
