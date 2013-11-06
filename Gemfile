@@ -1,4 +1,4 @@
-source 'https://rubygems.org'
+ source 'https://rubygems.org'
 
 gem 'rails', '3.2.11'
 gem 'haml-rails'
@@ -14,11 +14,14 @@ group :development do
   gem 'sqlite3'
   gem 'pry'
   gem 'pry-nav'
+end
+
+group :test, :development do
   gem 'rspec-rails'
 end
 
 group :test do
-  gem 'rspec-rails'
+  gem 'shoulda-matchers'
 end
 
 group :production do
