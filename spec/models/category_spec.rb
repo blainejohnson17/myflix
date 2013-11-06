@@ -13,4 +13,9 @@ describe Category do
     space_balls = Video.create(title: "Space Balls", description: "Space Movie", categories: [comedy])
     expect(comedy.videos).to eq([gooneys, space_balls])
   end
+
+  it "does not save a category without a name" do
+    category = Category.create()
+    expect(Category.count).to eq(0)
+  end
 end
