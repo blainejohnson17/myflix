@@ -1,4 +1,5 @@
 class Video < ActiveRecord::Base
-  has_many :categorizations, dependent: :destroy
-  has_many :categories, through: :categorizations
+  belongs_to :category
+
+  validates_presence_of :title, :description
 end

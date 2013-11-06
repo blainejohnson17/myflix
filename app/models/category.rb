@@ -1,4 +1,5 @@
 class Category < ActiveRecord::Base
-  has_many :categorizations, dependent: :destroy
-  has_many :videos, through: :categorizations
+  has_many :videos, order: :title
+
+  validates :name, presence: :true
 end

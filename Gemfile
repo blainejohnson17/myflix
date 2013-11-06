@@ -1,8 +1,8 @@
-source 'https://rubygems.org'
+ source 'https://rubygems.org'
 
 gem 'rails', '3.2.11'
 gem 'haml-rails'
-gem 'bootstrap-sass'
+gem 'bootstrap-sass', '~> 2.2.1.0'
 
 group :assets do
   gem 'sass-rails',   '~> 3.2.3'
@@ -14,6 +14,14 @@ group :development do
   gem 'sqlite3'
   gem 'pry'
   gem 'pry-nav'
+end
+
+group :test, :development do
+  gem 'rspec-rails'
+end
+
+group :test do
+  gem 'shoulda-matchers'
 end
 
 group :production do
