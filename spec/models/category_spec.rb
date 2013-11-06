@@ -2,17 +2,15 @@ require 'spec_helper'
 
 describe Category do 
   it "saves itself" do
-    category = Category.new(name: 'Comedy')
+    category = Category.new(name: "Comedy")
     category.save
-    Category.first.name.should == 'Comedy'
+    expect(Category.first).to eq(category)
   end
 
   it "has many videos" do
-    category = Category.create(name: 'TV')
-    
-    (1..10).each do |i|
-      category.videos << Video.create(title: "Movie#{i}", description: "Movie description #{i}")
-    end
-    category.videos.count.should == 10
+    comedy = Category.create(name: "Comedy")
+    gooneys = Video.create(title: "Gooneys", description: "Pirate Movie", categories: [comedy])
+    space_balls = Video.create(title: "Space Balls", description: "Space Movie", categories: [comedy])
+    expect(comedy.videos).to eq([gooneys, space_balls])
   end
 end
