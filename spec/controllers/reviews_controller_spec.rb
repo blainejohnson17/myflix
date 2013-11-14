@@ -6,17 +6,12 @@ describe ReviewsController do
     let(:video) { Fabricate(:video) }
 
     context "with authenticated user" do
-
         let(:current_user) { Fabricate(:user) }
-        before do
-          session[:user_id] = current_user.id
-        end
+        before { session[:user_id] = current_user.id }
+          
 
-      context "with valid input" do
-        
-        before do
-          post :create, review: Fabricate.attributes_for(:review), video_id: video.id
-        end
+      context "with valid input" do    
+        before { post :create, review: Fabricate.attributes_for(:review), video_id: video.id }
 
         it "redirects to video show page" do
           expect(response).to redirect_to video
@@ -68,6 +63,7 @@ describe ReviewsController do
       end
     end
     context "with unauthenticated user" do
+      
       it "redirects to the sign in page" do
         post :create, review: Fabricate.attributes_for(:review), video_id: video.id
         expect(response).to redirect_to sign_in_path
