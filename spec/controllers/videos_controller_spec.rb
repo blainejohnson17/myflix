@@ -20,6 +20,14 @@ describe VideosController do
         get :show, id: video
         expect(assigns(:reviews)).to match_array([review1, review2])
       end
+      
+      it "assigns @reviews in reverse chronological order" do
+        video = Fabricate(:video)
+        review1 = Fabricate(:review, video: video)
+        review2 = Fabricate(:review, video: video, created_at: 1.day.ago)
+        get :show, id: video
+        expect(assigns(:reviews)).to eq([review1, review2])        
+      end
     end
 
     context "with unauthenticated user" do
