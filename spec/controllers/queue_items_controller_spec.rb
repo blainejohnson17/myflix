@@ -4,18 +4,31 @@ describe QueueItemsController do
 
   describe "GET #index" do
 
-    it "assigns all queue_items to @queue_items for authenticated user" do
-      current_user = Fabricate(:user)
-      session[:user_id] = current_user.id
-      queue_item1 = Fabricate(:queue_item, user: current_user)
-      queue_item2 = Fabricate(:queue_item, user: current_user)
-      get :index
-      expect(assigns(:queue_items)).to match_array([queue_item1, queue_item2])
+    context "with authenticated user" do
+      let(:current_user) { Fabricate(:user) }
+      before { session[:user_id] = current_user.id }
+
+      it "assigns all queue_items to @queue_items for authenticated user" do
+        queue_item1 = Fabricate(:queue_item, user: current_user)
+        queue_item2 = Fabricate(:queue_item, user: current_user)
+        get :index
+        expect(assigns(:queue_items)).to match_array([queue_item1, queue_item2])
+      end
+
+      it "orders queue_items with position" do
+        queue_item1 = Fabricate(:queue_item, user: current_user, position: 2)
+        queue_item2 = Fabricate(:queue_item, user: current_user, position: 1)
+        get :index
+        expect(assigns(:queue_items)).to eq([queue_item2, queue_item1])
+      end
     end
 
-    it "redirects to sign in page for unauthenticated users" do
-      get :index
-      expect(response).to redirect_to sign_in_path
+    context "with unauthenticated user" do
+  
+      it "redirects to sign in page for unauthenticated users" do
+        get :index
+        expect(response).to redirect_to sign_in_path
+      end
     end
   end
 
@@ -82,22 +95,29 @@ describe QueueItemsController do
       before { session[:user_id] = current_user.id }
 
       it "redirects to my_queue page" do
-        queue_item = Fabricate(:queue_item, user: current_user )
+        queue_item = Fabricate(:queue_item, user: current_user)
         delete :destroy, id: queue_item.id
         expect(response).to redirect_to my_queue_path
       end
 
       it "deletes queue item" do
-        queue_item = Fabricate(:queue_item, user: current_user )
+        queue_item = Fabricate(:queue_item, user: current_user)
         delete :destroy, id: queue_item.id
         expect(QueueItem.count).to eq(0)
       end
 
       it "doesn't delete queue item if queue item is not in the current users queue" do        
         other_user = Fabricate(:user)
-        queue_item = Fabricate(:queue_item, user: other_user )
+        queue_item = Fabricate(:queue_item, user: other_user)
         delete :destroy, id: queue_item.id
         expect(QueueItem.count).to eq(1)
+      end
+
+      it "normalizes the remaining queue_items" do
+        queue_item1 = Fabricate(:queue_item, position: 1, user: current_user)
+        queue_item2 = Fabricate(:queue_item, position: 2, user: current_user)
+        delete :destroy, id: queue_item1.id
+        expect(QueueItem.first.position).to eq(1)
       end
     end
 
@@ -108,5 +128,102 @@ describe QueueItemsController do
         expect(response).to redirect_to sign_in_path
       end
     end
+  end
+
+  describe "POST #update_queue" do
+
+    context "with authenticated user" do
+      let(:current_user) { Fabricate(:user) }
+      before { session[:user_id] = current_user.id }
+
+      context "with valid input" do
+        
+        it "redirects to my queue page" do
+          queue_item1 = Fabricate(:queue_item, position: 1, user: current_user)
+          queue_item2 = Fabricate(:queue_item, position: 2, user: current_user)
+          post :update_queue, queue_items: [{id: queue_item1.id, position: 2}, {id: queue_item2.id, position: 1}]
+          expect(response).to redirect_to my_queue_path
+        end
+
+        it "updates position of all queue items in users queue" do
+          queue_item1 = Fabricate(:queue_item, position: 1, user: current_user)
+          queue_item2 = Fabricate(:queue_item, position: 2, user: current_user)
+          post :update_queue, queue_items: [{id: queue_item1.id, position: 2}, {id: queue_item2.id, position: 1}]
+          expect(queue_item1.reload.position).to eq(2)
+          expect(queue_item2.reload.position).to eq(1)
+        end
+
+        it "normalizes all queue_item positions in users queue" do
+          queue_item1 = Fabricate(:queue_item, position: 1, user: current_user)
+          queue_item2 = Fabricate(:queue_item, position: 2, user: current_user)
+          post :update_queue, queue_items: [{id: queue_item1.id, position: 3}, {id: queue_item2.id, position: 1}]
+          expect(queue_item1.reload.position).to eq(2)
+          expect(queue_item2.reload.position).to eq(1)
+        end
+      end
+
+      context "with invalid input" do
+
+        it "redirects to my queue page" do
+          queue_item1 = Fabricate(:queue_item, position: 1, user: current_user)
+          queue_item2 = Fabricate(:queue_item, position: 2, user: current_user)
+          post :update_queue, queue_items: [{id: queue_item1.id, position: 2.5}, {id: queue_item2.id, position: 1}]
+          expect(response).to redirect_to my_queue_path
+        end
+
+        it "doesn't change any queue_item position" do
+          queue_item1 = Fabricate(:queue_item, position: 1, user: current_user)
+          queue_item2 = Fabricate(:queue_item, position: 2, user: current_user)
+          post :update_queue, queue_items: [{id: queue_item1.id, position: 2.5}, {id: queue_item2.id, position: 1}]
+          expect(queue_item1.reload.position).to eq(1)
+          expect(queue_item2.reload.position).to eq(2)
+        end
+      end
+
+      context "with incomplete input" do
+
+        it "redirects to my queue page" do
+          queue_item1 = Fabricate(:queue_item, position: 1, user: current_user)
+          queue_item2 = Fabricate(:queue_item, position: 2, user: current_user)
+          post :update_queue, queue_items: [{id: queue_item2.id, position: 1}]
+          expect(response).to redirect_to my_queue_path
+        end
+
+        it "doesn't update any queue_items" do
+          queue_item1 = Fabricate(:queue_item, position: 1, user: current_user)
+          queue_item2 = Fabricate(:queue_item, position: 2, user: current_user)
+          post :update_queue, queue_items: [{id: queue_item2.id, position: 1}]
+          expect(queue_item1.reload.position).to eq(1)
+          expect(queue_item2.reload.position).to eq(2)
+        end
+      end
+
+      context "with queue_items from another users queue" do
+
+        it "redirects to my queue page" do
+          other_user = Fabricate(:user)
+          queue_item1 = Fabricate(:queue_item, position: 1, user: current_user)
+          queue_item2 = Fabricate(:queue_item, position: 2, user: other_user)
+          post :update_queue, queue_items: [{id: queue_item1.id, position: 2}, {id: queue_item2.id, position: 1}]
+          expect(response).to redirect_to my_queue_path
+        end
+
+        it "doesn't change any of the queue_items" do
+          other_user = Fabricate(:user)
+          queue_item1 = Fabricate(:queue_item, position: 1, user: current_user)
+          queue_item2 = Fabricate(:queue_item, position: 2, user: other_user)
+          post :update_queue, queue_items: [{id: queue_item1.id, position: 2}, {id: queue_item2.id, position: 1}]
+          expect(queue_item1.reload.position).to eq(1)
+          expect(queue_item2.reload.position).to eq(2)
+        end
+      end
+    end
+
+    context "with unauthenticated user"
+
+      it "redirects to sign in page" do
+        post :update_queue, queue_items: [{id: 1, position: 2}, {id: 2, position: 1}]
+        expect(response).to redirect_to sign_in_path
+      end
   end
 end
