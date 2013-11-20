@@ -33,6 +33,13 @@ class QueueItemsController < ApplicationController
     redirect_to my_queue_path
   end
 
+  def drag_sort
+    params[:queue_item].each_with_index do |id, index|
+          QueueItem.update_all({position: index+1}, {id: id})
+        end
+        render nothing: true
+  end
+
   private
 
   def queue_item_data_valid?
