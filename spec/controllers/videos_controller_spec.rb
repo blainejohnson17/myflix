@@ -15,8 +15,8 @@ describe VideosController do
 
       it "assigns the reviews for the requested video to @reviews" do
         video = Fabricate(:video)
-        review1 = Fabricate(:review, video: video)
-        review2 = Fabricate(:review, video: video)
+        review1 = Fabricate(:review, video: video, user: Fabricate(:user))
+        review2 = Fabricate(:review, video: video, user: Fabricate(:user))
         get :show, id: video
         expect(assigns(:reviews)).to match_array([review1, review2])
       end

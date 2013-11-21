@@ -5,7 +5,8 @@ describe Video do
   it { should belong_to(:category) }
   it { should validate_presence_of(:title) }
   it { should validate_presence_of(:description) }
-  it { should have_many(:reviews).order("created_at DESC")}
+  it { should have_many(:reviews).order("created_at DESC").dependent(:destroy) }
+  it { should have_many(:queue_items).dependent(:destroy) }
 
   describe "search_by_title" do
 
@@ -63,15 +64,20 @@ describe Video do
     end
 
     it "returns the average of all ratings when there are more than one reviews" do
-      Fabricate(:review, video: @video, rating: 2)
-      Fabricate(:review, video: @video, rating: 3)
+      bob = Fabricate(:user)
+      alice = Fabricate(:user)
+      Fabricate(:review, video: @video, rating: 2, user: bob)
+      Fabricate(:review, video: @video, rating: 3, user: alice)
       expect(@video.average_rating).to eq((2 + 3)/2.0)
     end
 
     it "returns the average with up to 2 decimal places of precision" do
-      Fabricate(:review, video: @video, rating: 1)
-      Fabricate(:review, video: @video, rating: 1)
-      Fabricate(:review, video: @video, rating: 2)
+      bob = Fabricate(:user)
+      alice = Fabricate(:user)
+      joe = Fabricate(:user)
+      Fabricate(:review, video: @video, rating: 1, user: bob)
+      Fabricate(:review, video: @video, rating: 1, user: alice)
+      Fabricate(:review, video: @video, rating: 2, user: joe)
       expect(@video.average_rating).to eq(1.33)
     end
   end

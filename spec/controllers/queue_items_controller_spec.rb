@@ -219,11 +219,12 @@ describe QueueItemsController do
       end
     end
 
-    context "with unauthenticated user"
+    context "with unauthenticated user" do
 
       it "redirects to sign in page" do
         post :update_queue, queue_items: [{id: 1, position: 2}, {id: 2, position: 1}]
         expect(response).to redirect_to sign_in_path
       end
+    end
   end
 end
