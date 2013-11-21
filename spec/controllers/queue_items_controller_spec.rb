@@ -136,7 +136,7 @@ describe QueueItemsController do
       let(:current_user) { Fabricate(:user) }
       before { session[:user_id] = current_user.id }
 
-      context "with valid input" do
+      context "with complete input" do
         
         it "redirects to my queue page" do
           queue_item1 = Fabricate(:queue_item, position: 1, user: current_user)
@@ -159,24 +159,6 @@ describe QueueItemsController do
           post :update_queue, queue_items: [{id: queue_item1.id, position: 3}, {id: queue_item2.id, position: 1}]
           expect(queue_item1.reload.position).to eq(2)
           expect(queue_item2.reload.position).to eq(1)
-        end
-      end
-
-      context "with invalid input" do
-
-        it "redirects to my queue page" do
-          queue_item1 = Fabricate(:queue_item, position: 1, user: current_user)
-          queue_item2 = Fabricate(:queue_item, position: 2, user: current_user)
-          post :update_queue, queue_items: [{id: queue_item1.id, position: 2.5}, {id: queue_item2.id, position: 1}]
-          expect(response).to redirect_to my_queue_path
-        end
-
-        it "doesn't change any queue_item position" do
-          queue_item1 = Fabricate(:queue_item, position: 1, user: current_user)
-          queue_item2 = Fabricate(:queue_item, position: 2, user: current_user)
-          post :update_queue, queue_items: [{id: queue_item1.id, position: 2.5}, {id: queue_item2.id, position: 1}]
-          expect(queue_item1.reload.position).to eq(1)
-          expect(queue_item2.reload.position).to eq(2)
         end
       end
 

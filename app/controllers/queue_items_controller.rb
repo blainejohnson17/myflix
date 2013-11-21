@@ -40,14 +40,18 @@ class QueueItemsController < ApplicationController
     render nothing: true
   end
 
+  def update_rating
+    queue_item = QueueItem.find(params[:queue_item_id])
+    queue_item.update_attributes(rating: params[:rating])
+    render nothing: true
+  end
+
   private
 
   def queue_item_data_valid?
     @queue_items_sorted.each do |queue_item_data|
-      return false if QueueItem.new(position: queue_item_data[:position]).invalid?
       return false if QueueItem.find(queue_item_data[:id]).user != current_user
     end
-    true
   end
 
   def queue_item_data_complete?
