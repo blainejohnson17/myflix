@@ -26,7 +26,7 @@
                     = button_to "Play", nil, class: "btn"
                   %td
                     = select_tag "queue_items[][rating]", options_for_reviews(queue_item.rating), id: "rating_#{queue_item.id}"
-                    %div(class="rateit" data-rateit-backingfld="#rating_#{queue_item.id}" data-queueitemid="#{queue_item.id}" data-update-url="#{update_rating_url}")
+                    %div(class="rateit rateit-active" data-rateit-backingfld="#rating_#{queue_item.id}" data-queueitemid="#{queue_item.id}" data-update-url="#{update_rating_url}")
                   %td
                     = link_to queue_item.category_name, queue_item.category
                   %td
