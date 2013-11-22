@@ -7,6 +7,7 @@ describe QueueItem do
   it { should validate_numericality_of(:position).only_integer }
 
   describe "#video_title" do
+
     it "returns the title of the associated video" do
       video = Fabricate(:video, title: 'Gooneys')
       queue_item = Fabricate(:queue_item, video: video)
@@ -15,6 +16,7 @@ describe QueueItem do
   end
 
   describe "#rating" do
+
     it "returns the rating of the associated video created by the current_user" do
       current_user = Fabricate(:user)
       video = Fabricate(:video)
@@ -22,6 +24,7 @@ describe QueueItem do
       queue_item = Fabricate(:queue_item, user: current_user, video: video)
       expect(queue_item.rating).to eq(5)
     end
+
     it "returns nil when the current_user has not rated the associated video" do
       current_user = Fabricate(:user)
       video = Fabricate(:video)
@@ -83,10 +86,10 @@ describe QueueItem do
         expect(video.reviews.count).to eq(0)
       end
     end
-
   end
 
   describe "#category_name" do
+
     it "return the category name of the associated video" do
       category = Fabricate(:category, name: 'Comedy')
       video = Fabricate(:video, category: category)
@@ -96,6 +99,7 @@ describe QueueItem do
   end
 
   describe "#category" do
+
     it "returns the category object associated with the video" do
       category = Fabricate(:category)
       video = Fabricate(:video, category: category)

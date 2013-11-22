@@ -18,7 +18,9 @@ class QueueItem < ActiveRecord::Base
     if review
       new_rating == "0" ? review.destroy : review.update_attributes(rating: new_rating)
     else
-      Review.create(user: user, video: video, rating: new_rating) unless new_rating == "0"
+      return if new_rating == "0"
+      review = Review.new(user: user, video: video, rating: new_rating)
+      review.save(validate: false)
     end
   end
 
