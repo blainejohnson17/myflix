@@ -16,6 +16,9 @@ Myflix::Application.routes.draw do
   resources :users, only: [:create]
   resources :sessions, only: [:create]
   resources :queue_items, only: [:create, :destroy]
+  post 'update_queue', to: 'queue_items#update_queue'
+  post 'drag_sort', to: 'queue_items#drag_sort'
+  post 'update_rating', to: 'queue_items#update_rating'
 
   get 'ui(/:action)', controller: 'ui'
 end

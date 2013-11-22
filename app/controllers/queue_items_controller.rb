@@ -13,11 +13,50 @@ class QueueItemsController < ApplicationController
 
   def destroy
     queue_item = QueueItem.find(params[:id])
-    queue_item.destroy if current_user.queue_items.include?(queue_item)
+    if current_user.queue_items.include?(queue_item)
+      queue_item.destroy
+      current_user.normalize_queue_items_positions
+    end
     redirect_to my_queue_path
   end
 
+  def update_queue
+    @queue_items_sorted = params[:queue_items].sort_by { |qi| qi['position'] }
+    if !queue_item_data_valid? || !queue_item_data_complete?
+      redirect_to my_queue_path
+      return
+    end
+    @queue_items_sorted.each_with_index do |queue_item_data, index|
+      queue_item = QueueItem.find(queue_item_data[:id])
+      queue_item.update_attributes(position: index + 1, rating: queue_item_data[:rating])
+    end
+    redirect_to my_queue_path
+  end
+
+  def drag_sort
+    params[:queue_item].each_with_index do |id, index|
+      QueueItem.update_all({position: index+1}, {id: id})
+    end
+    render nothing: true
+  end
+
+  def update_rating
+    queue_item = QueueItem.find(params[:queue_item_id])
+    queue_item.update_attributes(rating: params[:rating])
+    render nothing: true
+  end
+
   private
+
+  def queue_item_data_valid?
+    @queue_items_sorted.each do |queue_item_data|
+      return false if QueueItem.find(queue_item_data[:id]).user != current_user
+    end
+  end
+
+  def queue_item_data_complete?
+    @queue_items_sorted.count == current_user.queue_items.count
+  end
 
   def new_queue_item_position
     current_user.queue_items.count + 1

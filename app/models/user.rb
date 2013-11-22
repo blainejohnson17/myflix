@@ -7,5 +7,12 @@ class User < ActiveRecord::Base
   validates :full_name, presence: true
   validates :password, presence: true
   
-  has_many :queue_items
+  has_many :queue_items, order: 'position', dependent: :destroy
+  has_many :reviews, dependent: :destroy
+
+  def normalize_queue_items_positions
+    queue_items.each_with_index do |qi, index|
+      qi.update_attributes(position: index + 1)
+    end
+  end
 end
