@@ -6,7 +6,9 @@
       .video_info.span3
         %header
           %h3= @video.title
-          %span Rating: #{@video.average_rating}/5.0
+          %small Average Rating:
+          %div(class="rateit" data-rateit-value="#{@video.average_rating}" data-rateit-readonly="true" data-rateit-ispreset="true")
+
         %p= @video.description
         .actions
           = link_to "+ My Queue", queue_items_path(video_id: @video.id), method: :post, class: 'btn'
@@ -14,15 +16,16 @@
 %section.reviews.container
   .row
     .span10.offset1
-      = form_for [@video, Review.new] do |f|
-        %fieldset
-          %label Rate this video
-          = f.select :rating, options_for_reviews
-          %label Write Review
-          = f.text_area :content, rows: 6, class: "span6"
-        %fieldset.actions.clearfix
-          %input(type="submit" value="Submit" class="btn")
-          %a(href="") Cancel    
+      - if !@review
+        = form_for [@video, Review.new] do |f|
+          %fieldset
+            %label Rate this video
+            = f.select :rating, options_for_reviews(@review.rating)
+            %div(class="rateit" data-rateit-backingfld="#review_rating" data-id="#{@video.id}" data-update-url="#{update_rating_url}")
+            %label Write Review
+            = f.text_area :content, rows: 6, class: "span6"
+          %fieldset.actions.clearfix
+            %input(type="submit" value="Save" class="btn") 
 
       %header
         %h3 User Reviews (#{@reviews.count})
@@ -31,7 +34,7 @@
           %article.review
             %li.row
               .span2
-                %span Rating: #{review.rating} / 5
+                %div(class="rateit" data-rateit-value="#{review.rating}" data-rateit-readonly="true" data-rateit-ispreset="true") 
                 %p
                   by
                   = link_to review.user.full_name, "#"

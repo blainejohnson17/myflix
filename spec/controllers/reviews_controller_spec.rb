@@ -70,4 +70,9 @@ describe ReviewsController do
       end
     end
   end
+
+  describe "PUT #update" do
+    it "redirects to the video show page"
+    it "udpates the review"
+  end
 end

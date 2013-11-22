@@ -7,6 +7,7 @@ class VideosController < ApplicationController
   def show
     @video = Video.find(params[:id])
     @reviews = @video.reviews
+    @review = Review.where(user_id: current_user.id, video_id: @video.id).first
   end
 
   def search
