@@ -18,15 +18,14 @@ describe SessionsController do
 
   describe "POST #create" do
 
+    let(:bob) { Fabricate(:user) }
+    
     context "with valid credentials" do
 
-      before do
-        @bob = Fabricate(:user)
-        post :create, email: @bob.email, password: @bob.password
-      end
+      before { post :create, email: bob.email, password: bob.password }
 
       it "saves user id in session" do
-        expect(session[:user_id]).to eq(@bob.id)
+        expect(session[:user_id]).to eq(bob.id)
       end
 
       it "sets notice" do
@@ -40,10 +39,7 @@ describe SessionsController do
 
     context "with invalid credentials" do
 
-      before do
-        @bob = Fabricate(:user)
-        post :create, email: @bob.email, password: "wrong"      
-      end
+      before { post :create, email: bob.email, password: "wrong" }
 
       it "doesn't save user id in session" do
         expect(session[:user_id]).to be_blank
