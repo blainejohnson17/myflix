@@ -13,4 +13,8 @@ class User < ActiveRecord::Base
       qi.update_attributes(position: index + 1)
     end
   end
+
+  def queued_video?(video)
+    !queue_items.where(video_id: video.id).empty?
+  end
 end
