@@ -159,4 +159,37 @@ describe QueueItemsController do
       let(:action) { post :update_queue, queue_items: [{id: 1, position: 2}, {id: 2, position: 1}] }
     end
   end
+
+  describe "#drag_sort" do
+
+    let!(:queue_item1) { Fabricate(:queue_item, position: 1, user: current_user) }
+    let!(:queue_item2) { Fabricate(:queue_item, position: 2, user: current_user) }
+
+    it "renders nothing" do
+      post :drag_sort, queue_item: [queue_item2.id, queue_item1.id]
+      expect(response).to have_text(" ")
+    end
+
+    it "updates position of all queue items" do
+      post :drag_sort, queue_item: [queue_item2.id, queue_item1.id]
+      expect(queue_item1.reload.position).to eq(2)
+      expect(queue_item2.reload.position).to eq(1)
+    end
+  end
+
+  describe "#update_rating" do
+
+    let!(:queue_item1) { Fabricate(:queue_item, position: 1, user: current_user) }
+    let!(:review) { Fabricate(:review, video: queue_item1.video, rating: 1, user: current_user) }
+
+    it "renders nothing" do
+      post :update_rating, queue_item_id: queue_item1.video.id, rating: 3
+      expect(response).to have_text(" ")
+    end
+
+    it "updates rating of given video on users review" do
+      post :update_rating, queue_item_id: queue_item1.video.id, rating: 3
+      expect(review.reload.rating).to eq(3)
+    end
+  end
 end
