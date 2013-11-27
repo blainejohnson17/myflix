@@ -1,6 +1,6 @@
 class User < ActiveRecord::Base
   has_many :queue_items, order: 'position', dependent: :destroy
-  has_many :reviews, dependent: :destroy
+  has_many :reviews, order: 'created_at DESC', dependent: :destroy
 
   validates :email, presence: true, uniqueness: true
   validates :full_name, presence: true

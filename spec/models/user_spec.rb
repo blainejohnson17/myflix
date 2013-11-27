@@ -6,7 +6,7 @@ describe User do
   it { should validate_presence_of(:full_name) }
   it { should validate_presence_of(:password) }
   it { should have_many(:queue_items).order(:position).dependent(:destroy) }
-  it { should have_many(:reviews).dependent(:destroy) }
+  it { should have_many(:reviews).order('created_at DESC').dependent(:destroy) }
   it { should have_secure_password }
 
   describe "#queued_video?" do
