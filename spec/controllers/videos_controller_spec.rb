@@ -1,55 +1,40 @@
 require 'spec_helper'
 
 describe VideosController do
+
+  before { set_current_user }
+
   describe "GET #show" do
-    context "with authenticated user" do
-      before do
-        session[:user_id] = Fabricate(:user).id
-      end
 
-      it "assigns the requested video to @video"  do
-        video = Fabricate(:video)
-        get :show, id: video
-        expect(assigns(:video)).to eq(video)
-      end
+    let(:video) { Fabricate(:video) }
 
-      it "assigns the reviews for the requested video to @reviews" do
-        video = Fabricate(:video)
-        review1 = Fabricate(:review, video: video, user: Fabricate(:user))
-        review2 = Fabricate(:review, video: video, user: Fabricate(:user))
-        get :show, id: video
-        expect(assigns(:reviews)).to match_array([review1, review2])
-      end
+    it "assigns the requested video to @video"  do
+      get :show, id: video
+      expect(assigns(:video)).to eq(video)
     end
 
-    context "with unauthenticated user" do
-      it "redirects user to sign in page" do
-        video = Fabricate(:video)
-        get :show, id: video
-        expect(response).to redirect_to sign_in_path
-      end
+    it "assigns the reviews for the requested video to @reviews" do
+      review1 = Fabricate(:review, video: video, user: Fabricate(:user))
+      review2 = Fabricate(:review, video: video, user: Fabricate(:user))
+      get :show, id: video
+      expect(assigns(:reviews)).to match_array([review1, review2])
+    end
+
+    it_behaves_like "require_sign_in" do
+      let(:action) { get :show, id: 1 }
     end
   end
 
   describe "GET #search" do
-    context "with authenticated user" do
-      before do
-        session[:user_id] = Fabricate(:user).id
-      end
 
-      it "assigns the results of search to @videos" do
-        goonies = Fabricate(:video, title: 'Goonies')
-        get :search, term: 'go'
-        expect(assigns(:videos)).to eq([goonies])
-      end
+    it "assigns the results of search to @videos" do
+      goonies = Fabricate(:video, title: 'Goonies')
+      get :search, term: 'go'
+      expect(assigns(:videos)).to eq([goonies])
     end
 
-    context "with unauthenticated user" do
-      it "redirects user to sign in page" do
-        goonies = Fabricate(:video, title: 'Goonies')
-        get :search, term: 'go'
-        expect(response).to redirect_to sign_in_path
-      end
+    it_behaves_like "require_sign_in" do
+      let(:action) { get :search, term: 'go' }
     end
   end
 end

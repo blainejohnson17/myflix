@@ -14,9 +14,7 @@ describe UsersController do
 
     context "with valid attributes" do
 
-      before do
-        post :create, user: Fabricate.attributes_for(:user)
-      end
+      before { post :create, user: Fabricate.attributes_for(:user) }
 
       it "saves new user to the database" do
         expect(User.count).to eq(1)
@@ -37,9 +35,7 @@ describe UsersController do
 
     context "with invalid attributes" do
 
-      before do
-        post :create, user: Fabricate.attributes_for(:user, email: nil)
-      end
+      before { post :create, user: Fabricate.attributes_for(:user, email: nil)  }
 
       it "doesn't save new user to the database" do
         expect(User.count).to eq(0)
