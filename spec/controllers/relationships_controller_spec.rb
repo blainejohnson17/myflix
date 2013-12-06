@@ -39,5 +39,51 @@ describe RelationshipsController do
       delete :destroy, id: relationship.id
       expect(Relationship.count).to eq(1)
     end
+
+    it_behaves_like "require_sign_in" do
+      let(:action) { get :index }
+    end
+  end
+
+  describe "POST #create" do
+
+    let(:leader) { Fabricate(:user) }
+
+    before { set_current_user }
+
+    it "redirects to the people page" do
+      post :create, leader_id: leader.id
+      expect(response).to redirect_to people_path
+    end
+
+    it "saves new relationship" do
+      post :create, leader_id: leader.id
+      expect(Relationship.count).to eq(1)
+    end
+
+    it "creates a new relationship with the current_user as the follower" do
+      post :create, leader_id: leader.id
+      expect(leader.followers.first).to eq(current_user)
+    end
+
+    it "creates a new relationship with the specified user as the leader" do
+      post :create, leader_id: leader.id
+      expect(current_user.leaders.first).to eq(leader)      
+    end
+
+    it "doesn't create a relationship with the current_user as the leader" do
+      post :create, leader_id: current_user.id
+      expect(Relationship.count).to eq(0)      
+    end
+
+    it "doesn't create a duplicate relationship" do
+      Fabricate(:relationship, leader: leader, follower: current_user)
+      post :create, leader_id: leader
+      expect(Relationship.count).to eq(1)
+    end
+
+    it_behaves_like "require_sign_in" do
+      let(:action) { get :index }
+    end
   end
 end

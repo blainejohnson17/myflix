@@ -23,4 +23,25 @@ describe User do
       expect(current_user.queued_video?(Fabricate(:video))).to eq(false)
     end
   end
+
+  describe "#can_follow?" do
+
+    it "returns false if the current user is the same as the proposed leader" do
+      bob = Fabricate(:user)
+      expect(bob.can_follow?(bob)).to be_false
+    end
+
+    it "returns false if the current user is already following the proposed leader" do
+      bob = Fabricate(:user)
+      alice = Fabricate(:user)
+      Fabricate(:relationship, leader: alice, follower: bob)
+      expect(bob.can_follow?(alice)).to be_false
+    end
+
+    it "returns true if user is allowed to follow proposed leader" do
+      bob = Fabricate(:user)
+      alice = Fabricate(:user)
+      expect(bob.can_follow?(alice)).to be_true
+    end
+  end
 end

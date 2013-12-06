@@ -21,4 +21,8 @@ class User < ActiveRecord::Base
   def queued_video?(video)
     !queue_items.where(video_id: video.id).empty?
   end
+
+  def can_follow?(another_user)
+    !(self.leaders.include?(another_user) || self == another_user)
+  end
 end
