@@ -50,4 +50,16 @@ describe UsersController do
       end
     end
   end
+
+  describe "GET #show" do
+    it_behaves_like "require_sign_in" do
+      let(:action) { get :show, id: 2 }
+    end
+    it "assigns the requested user to @user" do
+      set_current_user
+      get :show, id: current_user.id
+      expect(assigns(:user)).to eq(current_user)
+    end
+
+  end
 end
